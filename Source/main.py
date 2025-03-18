@@ -1,5 +1,6 @@
+from http.client import HTTPResponse
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, responses
 from typing_extensions import Optional
 
 from Source.Services.Broker import Broker, Message
@@ -15,6 +16,14 @@ def create_topic(topic: str, partitions: int = 1):
         return {"message": f"Topic {topic} with {partitions} partitions created."}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+@app.get("/topics")
+def read_topics():
+    try:
+        topics = message_broker.get_topic_names()
+        return {"message": topics}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/topics/{topic_name}/produce")
 async def produce_message(topic_name: str, message: Message, partition: Optional[int] = 1):
@@ -38,8 +47,9 @@ async def consume_message(topic_name: str, partition: int):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-
-
+@app.get("/echo")
+async def echo():
+    return responses.Response(status_code=200)
 
 
 

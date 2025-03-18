@@ -43,3 +43,6 @@ class Broker(metaclass=Singleton):
         self.topics[name] = Topic(name, partitions)
         return self.topics[name]
 
+    def get_topic_names(self):
+        return list(self.topics.keys())
+
