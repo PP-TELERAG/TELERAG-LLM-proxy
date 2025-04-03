@@ -1,0 +1,18 @@
+{
+  "Message": {
+    "method": "somemethod optional",
+    "subject" : "somesubject optional",
+    "body" : {
+      "userId" : 1234,
+      "payload" : {
+        "query" : "somequery",
+        "context" : "somecontext",
+        "somethig" : "something"
+      },
+      "channelId" : 1234,
+      "payload" : {
+        "texts" : "texts"
+      }
+    }
+  },
+}

@@ -1,5 +1,3 @@
-from http.client import HTTPResponse
-
 from fastapi import FastAPI, HTTPException, responses
 from typing_extensions import Optional
 
@@ -38,7 +36,6 @@ async def produce_message(topic_name: str, message: Message, partition: Optional
 
 @app.get("/topics/{topic_name}/consume/{partition}")
 async def consume_message(topic_name: str, partition: int):
-
     if topic_name not in message_broker.topics:
         raise HTTPException(status_code=404, detail=f"Topic {topic_name} not found.")
     try:
