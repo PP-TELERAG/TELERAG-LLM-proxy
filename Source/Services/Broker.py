@@ -6,9 +6,11 @@ from typing import Dict, Optional
 
 from Source.Services.Singleton import Singleton
 
+
 class Message(BaseModel):
     key: Optional[str] = None
     payload: dict
+
 
 class Topic:
     def __init__(self, name: str, partitions: int = 1):
@@ -29,6 +31,10 @@ class Topic:
     async def consume(self, partition: int):
         if partition < 0 or partition > self.partitions:
             raise ValueError("Incorrect partition number.")
+        if self.queue[partition].empty():
+            raise ValueError(
+                f"Partition {partition} is empty. No messages to consume."
+            )
         message = await self.queue[partition].get()
         return message
 
@@ -45,4 +51,3 @@ class Broker(metaclass=Singleton):
 
     def get_topic_names(self):
         return list(self.topics.keys())
-
