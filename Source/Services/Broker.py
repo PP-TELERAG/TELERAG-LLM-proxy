@@ -6,9 +6,11 @@ from typing import Dict, Optional
 
 from Source.Services.Singleton import Singleton
 
+
 class Message(BaseModel):
     key: Optional[str] = None
     payload: dict
+
 
 class Topic:
     def __init__(self, name: str, partitions: int = 1):
@@ -45,4 +47,3 @@ class Broker(metaclass=Singleton):
 
     def get_topic_names(self):
         return list(self.topics.keys())
-
