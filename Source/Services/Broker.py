@@ -31,6 +31,10 @@ class Topic:
     async def consume(self, partition: int):
         if partition < 0 or partition > self.partitions:
             raise ValueError("Incorrect partition number.")
+        if self.queue[partition].empty():
+            raise ValueError(
+                f"Partition {partition} is empty. No messages to consume."
+            )
         message = await self.queue[partition].get()
         return message
 
