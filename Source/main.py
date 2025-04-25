@@ -2,16 +2,20 @@ from fastapi import FastAPI, HTTPException, responses
 from typing_extensions import Optional
 
 from Source.Services.Broker import Broker, Message
+from Source.Services.Router import notify_service
 
 app = FastAPI()
 message_broker = Broker()
 
 
 @app.post("/topics")
-def create_topic(topic: str, partitions: int = 1):
-
+def create_topic(
+    topic: str,
+    partitions: int = 1,
+    listener_url: Optional[str] = None,
+):
     try:
-        message_broker.create_topic(topic, partitions)
+        message_broker.create_topic(topic, partitions, listener_url)
         return {
             "message": f"Topic {topic} with {partitions} partitions created."
         }
@@ -37,9 +41,22 @@ async def produce_message(
             status_code=404, detail=f"Topic {topic_name} not found.")
 
     try:
+
         await message_broker.topics[topic_name].produce(
             message.model_dump(), partition
+        )
+
+        if message_broker.topics[topic_name].listener_url:
+            request = await notify_service(
+                message_broker.topics[topic_name].listener_url
             )
+            if not request:
+                # TODO: Need to use logger
+                print("Listener service is not available.")
+                raise HTTPException(
+                    status_code=503,
+                    detail="Listener service is not available.",
+                )
         return {"message": f"Message sent to topic {topic_name}."}
 
     except Exception as e:
