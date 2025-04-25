@@ -13,9 +13,14 @@ class Message(BaseModel):
 
 
 class Topic:
-    def __init__(self, name: str, partitions: int = 1):
+    def __init__(
+        self, name: str,
+        partitions: int = 1,
+        listener_url: Optional[str] = None
+    ):
         self.name = name
         self.partitions = partitions
+        self.listener_url = listener_url
 
         self.queue = [asyncio.Queue() for _ in range(partitions)]
 
@@ -43,10 +48,15 @@ class Broker(metaclass=Singleton):
     def __init__(self):
         self.topics: Dict[str, Topic] = {}
 
-    def create_topic(self, name: str, partitions: int = 1):
+    def create_topic(
+        self,
+        name: str,
+        partitions: int = 1,
+        listener_url: Optional[str] = None
+    ):
         if name in self.topics:
             raise ValueError(f"Topic with name '{name}' already exists.")
-        self.topics[name] = Topic(name, partitions)
+        self.topics[name] = Topic(name, partitions, listener_url)
         return self.topics[name]
 
     def get_topic_names(self):
